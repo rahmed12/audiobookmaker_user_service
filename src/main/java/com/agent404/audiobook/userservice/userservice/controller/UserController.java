@@ -39,26 +39,16 @@ public class UserController {
 
     @GetMapping("/{userId}")
     public Mono<UserResponse> getUserProfile(@PathVariable UUID userId) {
-
         return userService.getUserProfile(userId);
-
-        // return userService.getUserProfile(userId)
-        //     .map(userResponse -> ResponseEntity.ok().body(userResponse))
-        //     .onErrorResume(e -> Mono.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build()));
-        // return userService.getUserProfile(userId)
-        //     .<ResponseEntity<?>>map(userResponse -> ResponseEntity.ok().body(userResponse))
-        //     .onErrorResume(e -> Mono.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage())));
-
     }
 
 
     @PostMapping("/create")
-    public Mono<ResponseEntity<UserResponse>> createUser(@Valid @RequestBody CreateUserRequest createUserRequest ) {
+    public Mono<UserResponse> createUser(@Valid @RequestBody CreateUserRequest createUserRequest ) {
 
-        return userService.create(createUserRequest)
-            // TODO dont return password from userResponse
-            .map(userResponse -> ResponseEntity.ok().body(userResponse)) 
-            .onErrorResume(e -> Mono.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build()));
+        // TODO dont return password from userResponse
+        return userService.create(createUserRequest);
+
     }
 
 }

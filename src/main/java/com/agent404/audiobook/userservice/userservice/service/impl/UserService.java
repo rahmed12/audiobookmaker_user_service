@@ -7,12 +7,14 @@ import org.springframework.stereotype.Service;
 
 import com.agent404.audiobook.userservice.userservice.dto.CreateUserRequest;
 import com.agent404.audiobook.userservice.userservice.dto.UserResponse;
+import com.agent404.audiobook.userservice.userservice.exception.DuplicateEmailExceptoin;
 import com.agent404.audiobook.userservice.userservice.exception.ResourceNotFoundException;
 import com.agent404.audiobook.userservice.userservice.model.User;
+import com.agent404.audiobook.userservice.userservice.model.UserRole;
 import com.agent404.audiobook.userservice.userservice.repository.UserRepository;
 
 import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Schedulers;
+
 
 @Service
 public class UserService {
@@ -22,28 +24,29 @@ public class UserService {
 
     public Mono<UserResponse> create(CreateUserRequest createUserRequest) {
 
-        // return Mono.fromCallable(() -> {
-        //     if (userRepository.existsByEmail(createUserRequest.getEmail())){
-        //         throw new RuntimeException("Email already exist: " + createUserRequest.getEmail());
-        //     }
+        return userRepository.existsByEmail(createUserRequest.getEmail())
+        .flatMap(exists -> {
+            if (exists) {
+                return Mono.error(new DuplicateEmailExceptoin("Email Already exists: " + createUserRequest.getEmail()));
+            }
 
-        //     User user = new User();
-        //     user.setEmail(createUserRequest.getEmail());
-        //     user.setPassword(createUserRequest.getPassword());
+            User user = new User();
+            user.setEmail(createUserRequest.getEmail());
+            user.setPassword(createUserRequest.getPassword());
+            user.setRole(UserRole.USER); // optional
 
-        //     User savedUser  = userRepository.save(user);
-
-        //     UserResponse userResponse = new UserResponse();
-        //     userResponse.setId(savedUser.getId());
-        //     userResponse.setPassword(savedUser.getPassword());
-        //     userResponse.setEmail(savedUser.getEmail());
-        //     userResponse.setCreatedAt(savedUser.getCreatedAt());
-        //     userResponse.setUpdatedAt(savedUser.getUpdatedAt());
-
-        //     return userResponse;
-        // });
-        return Mono.empty();
-
+            return userRepository.save(user)
+                .map(savedUser -> {
+                    UserResponse userResponse = new UserResponse();
+                    userResponse.setId(savedUser.getId());
+                    userResponse.setEmail(savedUser.getEmail());
+                    userResponse.setPassword(savedUser.getPassword());
+                    userResponse.setCreatedAt(savedUser.getCreatedAt());
+                    userResponse.setUpdatedAt(savedUser.getUpdatedAt());
+                    return userResponse;
+                });
+        });
+        
     }
 
     public Mono<UserResponse> getUserProfile(UUID userId) {
@@ -60,20 +63,6 @@ public class UserService {
             return userResponse;
         });
         
-        // return Mono.fromCallable(() -> {
-        //     User user = userRepository.findById(userId)
-        //     .orElseThrow(() -> new ResourceNotFoundException("User Not Found: " + userId));
-            
-        //     UserResponse userResponse = new UserResponse();
-        //     userResponse.setId(user.getId());
-        //     userResponse.setPassword(user.getPassword());
-        //     userResponse.setEmail(user.getEmail());
-        //     userResponse.setCreatedAt(user.getCreatedAt());
-        //     userResponse.setUpdatedAt(user.getUpdatedAt());     
-            
-        //     return userResponse;
-
-        // }).subscribeOn(Schedulers.boundedElastic());
     }
 
 }
