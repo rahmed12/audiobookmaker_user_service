@@ -49,7 +49,7 @@ public class GlobalExceptionHandler {
     public Mono<ResponseEntity<CustomeErrorResponse>> handleValidation(WebExchangeBindException ex) {
         
         // Log the full validation detail
-        logger.warn("Validation failed: {}", ex.getAllErrors());
+        logger.error("Validation failed: {}", ex.getAllErrors());
 
         // Extract first validation message
         String message = ex.getFieldErrors().stream()
