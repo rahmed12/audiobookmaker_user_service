@@ -12,12 +12,13 @@ import com.agent404.audiobook.userservice.userservice.exception.ResourceNotFound
 import com.agent404.audiobook.userservice.userservice.model.User;
 import com.agent404.audiobook.userservice.userservice.model.UserRole;
 import com.agent404.audiobook.userservice.userservice.repository.UserRepository;
+import com.agent404.audiobook.userservice.userservice.service.IUserService;
 
 import reactor.core.publisher.Mono;
 
 
 @Service
-public class UserService {
+public class UserServiceImpl implements IUserService{
 
     @Autowired
     private UserRepository userRepository;
@@ -63,6 +64,10 @@ public class UserService {
             return userResponse;
         });
         
+    }
+
+    public Mono<Boolean> existsByUserId(UUID userId) {
+        return userRepository.existsById(userId);
     }
 
 }

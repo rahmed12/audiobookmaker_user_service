@@ -1,0 +1,1 @@
+curl -i -X GET http://localhost:8080/v1/api/users/ab606089-8947-4a16-a384-80d98da40e3a/validate
