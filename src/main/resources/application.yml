@@ -1,0 +1,17 @@
+spring:
+  application:
+    name: userservice
+  # datasource:
+  #   url: jdbc:postgresql://host.docker.internal:35432/audiobook_db
+  #   username: postgres
+  #   password: 
+  # jpa:
+  #   hibernate:
+  #     ddl-auto: update
+  r2dbc:
+    url: r2dbc:postgresql://host.docker.internal:${DB_PORT_USER}/audiobook_db
+    username: postgres
+    password: ${DB_PASSWORD_USER}
+  flyway:
+    url: jdbc:postgresql://host.docker.internal:${DB_PORT_USER}/audiobook_db
+    locations: classpath:db/postgres/migration
